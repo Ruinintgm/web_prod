@@ -1,7 +1,7 @@
 #!groovy
 
 pipeline {
-    agent { node ("af-stage-all01") }
+    agent { node ("avalanche") }
     options {
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
         timestamps()
@@ -23,16 +23,16 @@ stage("Removing old containers") {
     script{
       try{
         echo "=====================Removing====================="
-    sh "cd docker/stage/deploy ; sudo docker-compose down" 
-    sh "sudo docker rmi avalancheforecast/main:pipe_web_stage_parser"
-    sh "sudo docker rmi avalancheforecast/main:pipe_web_stage_frontend"
-    sh "sudo docker rmi avalancheforecast/main:pipe_web_stage_backend"
+    sh "cd docker/prod/deploy ; sudo docker-compose down" 
+    sh "sudo docker rmi avalancheforecast/main:pipe_web_prod_parser"
+    sh "sudo docker rmi avalancheforecast/main:pipe_web_prod_frontend"
+    sh "sudo docker rmi avalancheforecast/main:pipe_web_prod_backend"
     echo "Done!"
       } catch (err) {
                 echo "Контейнера не было"
             }
         try{
-    sh "rm -fR /tmp/web_stage_avalanche_configs"
+    sh "rm -fR /tmp/web_prod_avalanche_configs"
       } catch (err) {
                 echo "Файла не было"
             }
@@ -42,9 +42,9 @@ stage("Removing old containers") {
         stage("Run container from Dockerhub") {
             steps {
                 echo "=====================Running====================="
-                sh "mkdir /tmp/web_stage_avalanche_configs"
-                sh "cp nginx/nginx.conf /tmp/web_stage_avalanche_configs/nginx.conf "
-                sh "cd docker/stage/deploy ; sudo docker-compose up -d "
+                sh "mkdir /tmp/web_prod_avalanche_configs"
+                sh "cp nginx/nginx.conf /tmp/web_prod_avalanche_configs/nginx.conf "
+                sh "cd docker/prod/deploy ; sudo docker-compose up -d "
             }
         }
     }
